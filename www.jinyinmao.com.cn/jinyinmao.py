@@ -24,7 +24,7 @@ class NetWorkError(Exception):
 
 def build_request(url, headers=None, data=None, json_data=None, timeout=15, try_times=3):
     time.sleep(random.randint(1, 5)/10)
-    if headers is None:
+    if not headers:
         headers = get_headers()
     for i in range(try_times):
         try:
@@ -38,18 +38,17 @@ def build_request(url, headers=None, data=None, json_data=None, timeout=15, try_
             else:
                 response = requests.get(url, headers=headers, timeout=timeout)
             return response
-        except Exception as e:
+        except Exception as _:
             continue
     raise NetWorkError
 
 
 def write_to_csv(lines, filename):
-    csvfile = open(filename, 'w', encoding='utf-8')
-    spamwriter = csv.writer(csvfile, delimiter=',',
-                            quotechar='"', quoting=csv.QUOTE_MINIMAL)
-    for line in lines:
-        spamwriter.writerow(line)
-    csvfile.close()
+    with open(filename, 'w', encoding='utf-8') as csvfile:
+        spamwriter = csv.writer(csvfile, delimiter=',',
+                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        for line in lines:
+            spamwriter.writerow(line)
 
 
 def current_time():
@@ -77,7 +76,7 @@ def get_project_list(page):
         for key in need_keys:
             if key in item:
                 value = item[key]
-                if value is None:
+                if not value:
                     value = ''
                 if key in ['financingSumAmount', 'yield']:
                     value = value/100
@@ -118,7 +117,7 @@ def get_project_orders(project_id):
 def crawl_projects():
     start_page = 1  # 起始页
     end_page = 1  # 结束页
-    current_page = start_page-1
+    current_page = start_page - 1
     header = ['Category', 'topProductCategory', 'issueNo', 'yield', 'period', 'financingSumAmount', 'bankName', 'riskManagement', 'riskManagementMode', 'productId', 'assetInfoDesc', 'currentValueDate', 'drawee', 'draweeInfo', 'endorseImageLink', 'endorseImagesLink', 'endSellTime', 'enterpriseInfo', 'enterpriseLicense', 'enterpriseName', 'isLoans', 'isSignature', 'issueTime', 'paidAmount', 'pledgeNo', 'productCategory',
               'productIdentifier', 'productName', 'productNo', 'issueProductPuHuiZhongYinCarRequest', 'issueProductPuHuiZhongYinDebtorBasicInfoRequest', 'issueProductPuHuiZhongYinHouseRequest', 'repaid', 'repaidTime', 'repaymentDeadline', 'returnMoneyMethod', 'riskManagementInfo', 'settleDate', 'soldOut', 'soldOutTime', 'specifyValueDate', 'startSellTime', 'unitPrice', 'usage', 'valueDate', 'valueDateMode', 'valueDays']
     result = [header]
